@@ -1,4 +1,4 @@
-TFT Duino-coin wallet monitor ESP32-2424S012. ESP32-2424S012, Real-time clock. Board specifications:
+TFT Duino-coin wallet monitor ESP32-2424S012. Real-time clock. Board specifications:
 
 Wireless modules – Espressif Systems ESP32-C3-MINI-1U module
 SoC – ESP32-C3 RISC-V microcontroller at 160 MHz with 400 KB SRAM, WiFi 4 at 2.4 GHz, Bluetooth 5.0 LE and Mesh
