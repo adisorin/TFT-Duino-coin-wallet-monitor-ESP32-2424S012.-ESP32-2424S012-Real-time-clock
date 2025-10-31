@@ -13,3 +13,4 @@ Power
 2-pin JST-1.25 battery connector.
 ![547219393_24601542792869844_709400794998571944_n](https://github.com/user-attachments/assets/b411efea-400a-4813-aef5-d62fa5a19a30)
 ![550724234_24601536986203758_6425173906330713527_n](https://github.com/user-attachments/assets/f1413db3-2559-4fe4-84c4-0ea897fd72a2)
+![500132910-c25d793a-9292-432a-bd15-ab1f75898c87](https://github.com/user-attachments/assets/255fb637-58f4-4f71-8605-e386fb775e1b)
