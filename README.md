@@ -11,6 +11,5 @@ Miscellaneous – Reset and push buttons; On/Off Switch
 Power
 5V via USB-C port
 2-pin JST-1.25 battery connector.
-![548623537_24601537246203732_7285964679399376212_n](https://github.com/user-attachments/assets/d18b3ad9-49ba-487e-ad6c-0bd475e0c8be)
 ![547219393_24601542792869844_709400794998571944_n](https://github.com/user-attachments/assets/b411efea-400a-4813-aef5-d62fa5a19a30)
 ![550724234_24601536986203758_6425173906330713527_n](https://github.com/user-attachments/assets/f1413db3-2559-4fe4-84c4-0ea897fd72a2)
