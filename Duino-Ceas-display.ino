@@ -12,7 +12,7 @@
 WiFiMulti wifiMulti;
 
 // --- Duino-Coin ---
-const char* ducoUser = "my_cool_adis";
+const char* ducoUser = "user account";// cange user account
 String apiUrl = String("https://server.duinocoin.com/balances/") + ducoUser;
 
 // --- Pini TFT ---
@@ -188,8 +188,8 @@ void setup() {
   Serial.println("CST816S init OK");
 
   // Adaugă rețele WiFi
-  wifiMulti.addAP("%netrunoff%power ", "05111971232826#A#b#cc");
-  wifiMulti.addAP("%secretclub%power1", "19711944x..");
+  wifiMulti.addAP("SSID1", "password1");//Change here
+  wifiMulti.addAP("SSID2", "password2");//Change here
 
   if (wifiMulti.run() == WL_CONNECTED) {
     Serial.println("\nConectat la WiFi!");
@@ -226,7 +226,8 @@ void setup() {
 void loop() {
   unsigned long currentMillis = millis();
 
-  // reapariția butonului după 15 minute (900000 ms)
+  // reapariția butonului după 15 minute (900000 ms) //Announce that the "Duino Coin Faucet - AMOGUS
+" time has passed.
   if (!butonVizibil && (millis() - momentAscuns >= 900000)) {
     butonVizibil = true;
     Serial.println("Buton reapare!");
@@ -317,3 +318,4 @@ void loop() {
   // verificăm butonul tactil
   verificaTouch();
 }
+
