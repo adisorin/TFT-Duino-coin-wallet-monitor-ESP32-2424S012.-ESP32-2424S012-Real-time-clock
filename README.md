@@ -1,8 +1,6 @@
 
-
-
-## 🎤 **Prezentare 
-## Proiect: Display TFT cu Duino-Coin Balance și Ceas NTP**
+## 🎤 Prezentare Proiect: 
+## Display TFT cu Duino-Coin Balance și Ceas NTP
 
 ### 🧩 1. Introducere
 Bună ziua!
@@ -162,7 +160,7 @@ Acest proiect demonstrează:
 
 
 ### 🧾 12. Mesaj final
-> “Un mic ecran care spune multe: ora exactă, starea rețelei și valoarea muncii tale digitale – totul într-un singur dispozitiv inteligent!”
+Un mic ecran care spune multe: ora exactă, starea rețelei și valoarea muncii tale digitale – totul într-un singur dispozitiv inteligent!
 
 ![547219393_24601542792869844_709400794998571944_n](https://github.com/user-attachments/assets/b411efea-400a-4813-aef5-d62fa5a19a30)
 ![550724234_24601536986203758_6425173906330713527_n](https://github.com/user-attachments/assets/f1413db3-2559-4fe4-84c4-0ea897fd72a2)
