@@ -1,10 +1,10 @@
 
 
 
-## 🎤 **Prezentare publică – Proiect: Display TFT cu Duino-Coin Balance și Ceas NTP**
+## 🎤 **Prezentare 
+## Proiect: Display TFT cu Duino-Coin Balance și Ceas NTP**
 
 ### 🧩 1. Introducere
-
 Bună ziua!
 Astăzi vă voi prezenta un proiect realizat cu microcontrolerul **ESP32**, care afișează în timp real:
 
@@ -14,20 +14,16 @@ Astăzi vă voi prezenta un proiect realizat cu microcontrolerul **ESP32**, care
 
 Sistemul are și funcționalitate offline — dacă nu există conexiune WiFi, ceasul continuă să funcționeze local, iar interfața rămâne activă.
 
----
 
 ### ⚙️ 2. Componente hardware utilizate
-
 * **ESP32 / placa compatibilă**
 * **Display TFT circular GC9A01A** (controlat prin SPI)
 * **Touchscreen capacitiv CST816S** (prin I²C)
 * **Conexiune WiFi**
 * **Cont Duino-Coin** pentru acces la API-ul de balanță
 
----
 
 ### 🔌 3. Biblioteci incluse
-
 Codul folosește mai multe biblioteci importante:
 
 ```cpp
@@ -44,7 +40,6 @@ Codul folosește mai multe biblioteci importante:
 ---
 
 ### 🌐 4. Conectarea la WiFi și sincronizarea orei
-
 Programul adaugă mai multe rețele WiFi folosind `WiFiMulti`, pentru a se conecta automat la cea mai puternică:
 
 ```cpp
@@ -60,10 +55,8 @@ configTime(1 * 3600, 3600, "pool.ntp.org", "time.nist.gov");
 
 Dacă nu există internet, ecranul afișează mesajul **“No WiFi...”**, dar ceasul continuă local pe baza ultimului timp sincronizat.
 
----
 
 ### 💰 5. Interfața Duino-Coin – afișarea balanței
-
 La fiecare **30 de secunde**, dispozitivul trimite o cerere către API-ul oficial Duino-Coin:
 
 ```cpp
@@ -87,10 +80,8 @@ Aceste date sunt parsate și afișate pe ecran:
 
 Dacă cererea eșuează, se afișează mesajul **“Eroare API !!!”** pe roșu.
 
----
 
 ### ⏰ 6. Ceas digital cu actualizare automată
-
 Ceasul se actualizează:
 
 * la fiecare secundă local (calculat din ultimul timp sincronizat);
@@ -104,10 +95,8 @@ HH:MM:SS
 
 Dacă nu s-a reușit sincronizarea, apare mesajul **“No Time Sync!”**.
 
----
 
 ### 🖲️ 7. Touchscreen și butonul tactil
-
 Touchscreen-ul CST816S permite detectarea atingerilor.
 Pe ecran există un buton tactil care:
 
@@ -123,10 +112,8 @@ verificaTouch();
 
 Aceasta citește coordonatele de pe touchscreen și compară cu zona butonului.
 
----
 
 ### 🔄 8. Actualizări și timere
-
 Proiectul folosește mai multe cronometre interne (`millis()`):
 
 * 10 secunde – verificare reconectare WiFi
@@ -136,27 +123,22 @@ Proiectul folosește mai multe cronometre interne (`millis()`):
 
 Acest sistem de **timing asincron** permite rularea fără blocaje și fără `delay()` inutile.
 
----
 
 ### 🧠 9. Funcționare generală – flux logic
 
 **1️⃣ Setup:**
-
 * inițializează ecranul, touch-ul și WiFi-ul;
 * sincronizează ora;
 * afișează starea inițială.
 
 **2️⃣ Loop:**
-
 * actualizează ceasul în timp real;
 * face cereri periodice la API;
 * verifică WiFi și butonul tactil;
 * reafișează interfața după fiecare actualizare.
 
----
 
 ### 🎨 10. Interfața grafică
-
 Ecranul TFT este încadrat de un cerc albastru (funcția `desenCercMargine()`), iar textul este colorat diferit pentru claritate:
 
 * **Verde** – conexiune reușită / balanță
@@ -164,10 +146,8 @@ Ecranul TFT este încadrat de un cerc albastru (funcția `desenCercMargine()`), 
 * **Albastru** – mesaj de actualizare „PAY!”
 * **Galben** – afișarea timpului
 
----
 
 ### 💡 11. Concluzii și posibile extinderi
-
 Acest proiect demonstrează:
 
 * integrarea unei interfețe grafice circulare cu date online;
@@ -175,22 +155,14 @@ Acest proiect demonstrează:
 * și gestionarea inteligentă a conexiunilor și timpului.
 
 **Posibile îmbunătățiri:**
-
 * adăugarea unui meniu interactiv complet pe touch;
 * integrare cu portofele multiple Duino-Coin;
 * salvarea datelor local pe SPIFFS sau SD card;
 * afișarea unui grafic istoric al balanței.
 
----
 
 ### 🧾 12. Mesaj final
-
 > “Un mic ecran care spune multe: ora exactă, starea rețelei și valoarea muncii tale digitale – totul într-un singur dispozitiv inteligent!”
-
----
-
-Vrei să ți-o transform într-o **prezentare PowerPoint / PDF cu slide-uri** (cu titluri, imagini și text pentru vorbit)?
-Pot genera automat fișierul și conținutul grafic (inclusiv imagini reprezentative cu ecranul TFT și diagrame de conexiuni).
 
 ![547219393_24601542792869844_709400794998571944_n](https://github.com/user-attachments/assets/b411efea-400a-4813-aef5-d62fa5a19a30)
 ![550724234_24601536986203758_6425173906330713527_n](https://github.com/user-attachments/assets/f1413db3-2559-4fe4-84c4-0ea897fd72a2)
