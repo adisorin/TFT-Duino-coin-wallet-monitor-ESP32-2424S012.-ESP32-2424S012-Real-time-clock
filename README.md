@@ -158,6 +158,7 @@ Acest proiect demonstrează:
 * salvarea datelor local pe SPIFFS sau SD card;
 * afișarea unui grafic istoric al balanței.
 
+Autor: Sorinescu Adrian 
 
 ### 🧾 12. Mesaj final
 Un mic ecran care spune multe: ora exactă, starea rețelei și valoarea muncii tale digitale – totul într-un singur dispozitiv inteligent!
