@@ -194,10 +194,11 @@ void setup() {
   if (wifiMulti.run() == WL_CONNECTED) {
     Serial.println("\nConectat la WiFi!");
 // Setează automat fusul orar pentru România cu DST ///////////////
-    setenv("TZ", "EET-2EEST,M3.5.0/3,M10.5.0/3", 1);
+    configTzTime("EET-2EEST,M3.5.0/3,M10.5.0/4", ntpServer);
+    //setenv("TZ", "EET-2EEST,M3.5.0/3,M10.5.0/3", 1);//anulat
     tzset();
 
-    configTime(1 * 3600, 3600, "pool.ntp.org", "time.nist.gov");
+    //configTime(1 * 3600, 3600, "pool.ntp.org", "time.nist.gov");//anulat
     ///////////////////////////////////////////////////////////////
     actualizeazaTimpLocal();
 
@@ -318,4 +319,5 @@ void loop() {
   // verificăm butonul tactil
   verificaTouch();
 }
+
 
