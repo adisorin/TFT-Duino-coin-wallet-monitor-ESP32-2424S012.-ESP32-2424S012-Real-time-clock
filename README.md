@@ -48,7 +48,7 @@ wifiMulti.addAP("SSID2", "password2");
 După conectare, fusul orar este setat automat pentru **România (EET/EEST)**, iar ora este sincronizată cu servere NTP:
 
 ```cpp
-configTime(1 * 3600, 3600, "pool.ntp.org", "time.nist.gov");
+configTzTime("EET-2EEST,M3.5.0/3,M10.5.0/4", ntpServer);
 ```
 
 Dacă nu există internet, ecranul afișează mesajul **“No WiFi...”**, dar ceasul continuă local pe baza ultimului timp sincronizat.
