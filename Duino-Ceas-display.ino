@@ -6,13 +6,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_GC9A01A.h>
 #include <time.h>
-#include <Wire.h>   // pentru touchscreen CST816S
+#include <Wire.h>
 
 // --- Configurație WiFi ---
 WiFiMulti wifiMulti;
 
 // --- Duino-Coin ---
-const char* ducoUser = "user account";// cange user account
+const char* ducoUser = "my_cool_adis";
 String apiUrl = String("https://server.duinocoin.com/balances/") + ducoUser;
 
 // --- Pini TFT ---
@@ -31,7 +31,7 @@ const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3 * 3600;
 const int daylightOffset_sec = 0;
 
-// Variabile pentru ceas offline
+// Variabile ceas offline
 time_t lastSynced = 0;   
 unsigned long lastMillis = 0;
 bool timeValid = false;  
@@ -55,28 +55,43 @@ struct TouchPoint {
 // --- Buton tactil ---
 bool butonVizibil = true;
 unsigned long momentAscuns = 0;
-
-// Poziția și dimensiunile butonului pe ecran
 #define BTN_X 70
 #define BTN_Y 195
 #define BTN_W 95
 #define BTN_H 30
 
-// ---------------------------
-// FUNCȚII
-// ---------------------------
+// ------------------------------
+//         AUTO DIMMING
+// ------------------------------
+unsigned long lastTouchTime = 0;
+bool dimmed = false;
 
-// Citește coordonatele atingerii de la CST816S
+// ------------------------------
+// PWM BACKLIGHT ESP32-C3 (analogWrite)
+// ------------------------------
+void initBacklightPWM() {
+  pinMode(TFT_BL, OUTPUT);
+  analogWrite(TFT_BL, 255); // 100% luminozitate
+}
+
+void setBacklight(uint8_t val) {
+  analogWrite(TFT_BL, val);  // val = 0–255
+}
+
+// ------------------------------
+// Funcții generale
+// ------------------------------
+
 bool readTouch(TouchPoint &p) {
   Wire.beginTransmission(CST816S_ADDR);
-  Wire.write(0x01);  // registru date touch
+  Wire.write(0x01);
   Wire.endTransmission();
   Wire.requestFrom(CST816S_ADDR, 6);
 
   if (Wire.available() < 6) return false;
 
-  Wire.read(); // Gesture (ignorat acum)
-  uint8_t event = Wire.read(); // 0=down, 2=contact
+  Wire.read(); // gesture ignorat
+  uint8_t event = Wire.read();
   uint8_t xh = Wire.read();
   uint8_t xl = Wire.read();
   uint8_t yh = Wire.read();
@@ -84,12 +99,10 @@ bool readTouch(TouchPoint &p) {
 
   p.x = ((xh & 0x0F) << 8) | xl;
   p.y = ((yh & 0x0F) << 8) | yl;
-  p.touched = (event != 0);// sau (event != 0 || event == 2);
-
+  p.touched = (event != 0);
   return true;
 }
 
-// Desenează butonul
 void desenButon() {
   if (butonVizibil) {
     tft.fillRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, GC9A01A_BLUE);
@@ -98,7 +111,6 @@ void desenButon() {
     tft.setTextColor(GC9A01A_WHITE);
     tft.print("PAY-15'");
   } else {
-    // Schimbare culoare buton
     tft.fillRoundRect(BTN_X, BTN_Y, BTN_W, BTN_H, 10, GC9A01A_GREEN);
     tft.setCursor(BTN_X + 6, BTN_Y + 9);
     tft.setTextSize(2);
@@ -107,22 +119,30 @@ void desenButon() {
   }
 }
 
-// Verifică dacă butonul a fost apăsat
 void verificaTouch() {
   TouchPoint p;
 
-  if (butonVizibil && readTouch(p) && p.touched) {
-    if (p.x > BTN_X && p.x < (BTN_X + BTN_W) &&
+  if (readTouch(p) && p.touched) {
+    lastTouchTime = millis(); // reset idle timer
+
+    if (dimmed) {
+      setBacklight(255);  // revenire 100%
+      dimmed = false;
+      Serial.println("Luminozitate 100% (atingere)");
+    }
+
+    if (butonVizibil &&
+        p.x > BTN_X && p.x < (BTN_X + BTN_W) &&
         p.y > BTN_Y && p.y < (BTN_Y + BTN_H)) {
+
       Serial.println("Buton apasat!");
-      butonVizibil = false;             // ascundem butonul
-      momentAscuns = millis();          // salvăm momentul
+      butonVizibil = false;
+      momentAscuns = millis();
       desenButon();
     }
   }
 }
 
-// Actualizează timpul local prin NTP
 void actualizeazaTimpLocal() {
   struct tm timeinfo;
   if (getLocalTime(&timeinfo)) {
@@ -133,7 +153,6 @@ void actualizeazaTimpLocal() {
   }
 }
 
-// Desenează ceasul pe ecran
 void afiseazaCeas() {
   if (!timeValid) {
     tft.setCursor(45, 150);
@@ -155,109 +174,95 @@ void afiseazaCeas() {
   tft.print(timp);
 }
 
-// Desenează cercul de contur pe marginea ecranului
 void desenCercMargine() {
   tft.drawCircle(tft.width()/2, tft.height()/2, tft.width()/2 - 1, GC9A01A_BLUE);
 }
 
-// ---------------------------
+// ------------------------------
 // SETUP
-// ---------------------------
+// ------------------------------
 void setup() {
   Serial.begin(115200);
 
-  pinMode(TFT_BL, OUTPUT);
-  digitalWrite(TFT_BL, HIGH);
+  initBacklightPWM();
+  lastTouchTime = millis();
 
   SPI.begin(TFT_SCLK, TFT_MISO, TFT_MOSI, TFT_CS);
   delay(100);
 
   tft.begin();
   tft.fillScreen(GC9A01A_BLACK);
-
-  desenCercMargine(); // cerc pe margine
+  desenCercMargine();
 
   tft.setTextColor(GC9A01A_BLUE);
   tft.setTextSize(2);
   tft.setCursor(20, 100);
   tft.println("Conectare WiFi...");
 
-  // Inițializare touchscreen
   Wire.begin(I2C_SDA, I2C_SCL);
   delay(50);
-  Serial.println("CST816S init OK");
 
-  // Adaugă rețele WiFi
-  wifiMulti.addAP("SSID1", "password1");//Change here
-  wifiMulti.addAP("SSID2", "password2");//Change here
+  wifiMulti.addAP("%netrunoff%power ", "05111971232826#A#b#cc");
+  wifiMulti.addAP("%secretclub%power1", "19711944x..");
 
   if (wifiMulti.run() == WL_CONNECTED) {
-    Serial.println("\nConectat la WiFi!");
-// Setează automat fusul orar pentru România cu DST ///////////////
-    configTzTime("EET-2EEST,M3.5.0/3,M10.5.0/4", ntpServer);
-    //setenv("TZ", "EET-2EEST,M3.5.0/3,M10.5.0/3", 1);//anulat
-    tzset();
 
-    //configTime(1 * 3600, 3600, "pool.ntp.org", "time.nist.gov");//anulat
-    ///////////////////////////////////////////////////////////////
+    configTzTime("EET-2EEST,M3.5.0/3,M10.5.0/4", ntpServer);
     actualizeazaTimpLocal();
 
     tft.fillScreen(GC9A01A_BLACK);
-    desenCercMargine(); // redesenăm cercul după fillScreen
+    desenCercMargine();
 
     tft.setTextColor(GC9A01A_GREEN);
     tft.setCursor(70, 100);
     tft.println("WiFi OK!");
-  } else {
-    Serial.println("Pornit fara WiFi!");
-    tft.fillScreen(GC9A01A_BLACK);
-    desenCercMargine(); // redesenăm cercul
 
+  } else {
+    tft.fillScreen(GC9A01A_BLACK);
+    desenCercMargine();
     tft.setTextColor(GC9A01A_RED);
     tft.setCursor(50, 100);
     tft.println("No WiFi...");
   }
 
-  desenButon(); // afișăm butonul la pornire
+  desenButon();
 }
 
-// ---------------------------
+// ------------------------------
 // LOOP
-// ---------------------------
+// ------------------------------
 void loop() {
   unsigned long currentMillis = millis();
 
-  // reapariția butonului după 15 minute (900000 ms) //Announce that the "Duino Coin Faucet - AMOGUS
-" time has passed.
+  // Reapare buton dupa 15 minute
   if (!butonVizibil && (millis() - momentAscuns >= 900000)) {
     butonVizibil = true;
-    Serial.println("Buton reapare!");
     desenButon();
   }
 
-  // reconectare WiFi la fiecare 10 secunde
+  // Reconnect WiFi
   if (currentMillis - lastWifiCheck > 10000) {
     wifiMulti.run();
     lastWifiCheck = currentMillis;
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    // sincronizare NTP la fiecare minut
+
     if (currentMillis - lastSyncAttempt > 60000) {
       actualizeazaTimpLocal();
       lastSyncAttempt = currentMillis;
     }
 
-    // cerere API la fiecare 30 secunde
     if (currentMillis - lastApiCheck > 30000) {
+
       HTTPClient http;
       http.begin(apiUrl);
 
       int httpCode = http.GET();
       if (httpCode == 200) {
+
         String payload = http.getString();
-        Serial.println(payload);
-        // afisare ”PAY” cu albastru atunci cand se cere API la 30 de secunde
+
         tft.setCursor(85, 20);
         tft.setTextSize(3);
         tft.setTextColor(GC9A01A_BLUE);
@@ -266,39 +271,42 @@ void loop() {
 
         StaticJsonDocument<512> doc;
         if (deserializeJson(doc, payload) == DeserializationError::Ok) {
+
           float balance = doc["result"]["balance"].as<float>();
 
           tft.fillScreen(GC9A01A_BLACK);
-          desenCercMargine(); // redesenăm cercul
+          desenCercMargine();
           tft.setCursor(50, 55);
           tft.setTextSize(2);
           tft.setTextColor(GC9A01A_WHITE);
           tft.println("DUCO Wallet:");
+
           tft.setCursor(35, 100);
           tft.setTextSize(3);
           tft.setTextColor(GC9A01A_GREEN);
           tft.println(balance, 4);
 
           afiseazaCeas();
-          desenButon(); // redesenează butonul
+          desenButon();
         }
+
       } else {
-        Serial.println("Eroare API DuinoCoin");
         tft.fillScreen(GC9A01A_BLACK);
-        desenCercMargine(); // redesenăm cercul
+        desenCercMargine();
         tft.setCursor(45, 100);
         tft.setTextSize(2);
         tft.setTextColor(GC9A01A_RED);
         tft.println("Eroare API !!!");
-        desenButon(); // redesenează butonul
+        desenButon();
       }
+
       http.end();
       lastApiCheck = currentMillis;
     }
+
   } else {
-    // Mod offline: doar ceas
     tft.fillScreen(GC9A01A_BLACK);
-    desenCercMargine(); // redesenăm cercul
+    desenCercMargine();
     tft.setTextColor(GC9A01A_RED);
     tft.setCursor(50, 100);
     tft.setTextSize(2);
@@ -308,7 +316,7 @@ void loop() {
     delay(1000);
   }
 
-  // actualizare ceas la fiecare secundă
+  // Actualizare ceas la fiecare secundă
   static unsigned long lastClockUpdate = 0;
   if (currentMillis - lastClockUpdate > 1000) {
     afiseazaCeas();
@@ -316,9 +324,14 @@ void loop() {
     lastClockUpdate = currentMillis;
   }
 
-  // verificăm butonul tactil
+  // Touch
   verificaTouch();
+
+  // AUTO-DIMMING 3 MIN
+  unsigned long idleTime = millis() - lastTouchTime;
+  if (!dimmed && idleTime > 60000) { // 3 minute
+    setBacklight(15);  // 20%
+    dimmed = true;
+    Serial.println("Dimming ON (20%)");
+  }
 }
-
-
-
