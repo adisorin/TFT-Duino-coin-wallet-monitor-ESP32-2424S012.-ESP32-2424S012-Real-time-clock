@@ -12,7 +12,7 @@
 WiFiMulti wifiMulti;
 
 // --- Duino-Coin ---
-const char* ducoUser = "my_cool_adis";
+const char* ducoUser = "user acocount";
 String apiUrl = String("https://server.duinocoin.com/balances/") + ducoUser;
 
 // --- Pini TFT ---
@@ -202,8 +202,8 @@ void setup() {
   Wire.begin(I2C_SDA, I2C_SCL);
   delay(50);
 
-  wifiMulti.addAP("%netrunoff%power ", "05111971232826#A#b#cc");
-  wifiMulti.addAP("%secretclub%power1", "19711944x..");
+  wifiMulti.addAP("SSID1 ", "PASSWORD1");
+  wifiMulti.addAP("SSID2", "PASSWORD2");
 
   if (wifiMulti.run() == WL_CONNECTED) {
 
@@ -335,3 +335,4 @@ void loop() {
     Serial.println("Dimming ON (20%)");
   }
 }
+
